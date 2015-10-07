@@ -17,6 +17,7 @@
 
 #include "asg.h"
 #include "syscalls.h"
+#include "state.h"
 
 void seed_rng(uint32_t seed)
 {
@@ -42,7 +43,8 @@ void seed_rng()
 
 uint32_t random_int()
 {
-    return get_uint32();
+  return (crawl_state.generating_level ? get_uint32(you.where_are_you+2) : get_uint32(0));
+
 }
 
 // [low, high]
@@ -108,7 +110,7 @@ static int _random2(int max, int rng)
 // [0, max)
 int random2(int max)
 {
-    return _random2(max, 0);
+  return (crawl_state.generating_level ? _random2(max,you.where_are_you+2) : _random2(max,0));
 }
 
 // [0, max), separate RNG state
@@ -303,7 +305,7 @@ int binomial(unsigned n_trials, unsigned trial_prob, unsigned scale)
 // range [0, 1.0)
 double random_real()
 {
-    return get_uint32() / (1.0 + AsgKISS::max());
+    return random_int() / (1.0 + AsgKISS::max());
 }
 
 // Roll n_trials, return true if at least one succeeded.  n_trials might be
@@ -358,7 +360,7 @@ bool defer_rand::x_chance_in_y_contd(int x, int y, int index)
     do
     {
         if (index == int(bits.size()))
-            bits.push_back(get_uint32());
+	  bits.push_back(crawl_state.generating_level ? get_uint32(you.where_are_you+2) : get_uint32(0));
 
         uint64_t expn_rand_1 = uint64_t(bits[index++]) * y;
         uint64_t expn_rand_2 = expn_rand_1 + y;
@@ -381,7 +383,7 @@ int defer_rand::random2(int maxp1)
         return 0;
 
     if (bits.empty())
-        bits.push_back(get_uint32());
+      bits.push_back((crawl_state.generating_level ? get_uint32(you.where_are_you+2) : get_uint32(0));
 
     uint64_t expn_rand_1 = uint64_t(bits[0]) * maxp1;
     uint64_t expn_rand_2 = expn_rand_1 + maxp1;

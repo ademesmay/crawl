@@ -10,7 +10,7 @@
 
 #include "asg.h"
 
-static AsgKISS asg_rng[2];
+static AsgKISS asg_rng[NUM_BRANCHES+2];
 
 AsgKISS &AsgKISS::generator(int which)
 {
