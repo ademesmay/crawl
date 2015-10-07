@@ -383,7 +383,7 @@ int defer_rand::random2(int maxp1)
         return 0;
 
     if (bits.empty())
-      bits.push_back((crawl_state.generating_level ? get_uint32(you.where_are_you+2) : get_uint32(0));
+      bits.push_back((crawl_state.generating_level ? get_uint32(you.where_are_you+2) : get_uint32(0)));
 
     uint64_t expn_rand_1 = uint64_t(bits[0]) * maxp1;
     uint64_t expn_rand_2 = expn_rand_1 + maxp1;
