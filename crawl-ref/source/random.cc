@@ -43,8 +43,11 @@ void seed_rng()
 
 uint32_t random_int()
 {
-  return (crawl_state.generating_level ? get_uint32(you.where_are_you+2) : get_uint32(0));
-
+  if(crawl_state.generating_dungeon)
+    return (get_uint32(2));
+  else
+    return (crawl_state.generating_level ? get_uint32(you.where_are_you+3) : get_uint32(0));
+  
 }
 
 // [low, high]
@@ -110,7 +113,10 @@ static int _random2(int max, int rng)
 // [0, max)
 int random2(int max)
 {
-  return (crawl_state.generating_level ? _random2(max,you.where_are_you+2) : _random2(max,0));
+   if(crawl_state.generating_dungeon)
+     return (_random2(max,2));
+   else
+    return (crawl_state.generating_level ? _random2(max,you.where_are_you+3) : _random2(max,0));
 }
 
 // [0, max), separate RNG state

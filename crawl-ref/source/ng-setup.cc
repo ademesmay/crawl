@@ -29,6 +29,7 @@
 #include "spl-book.h"
 #include "spl-util.h"
 #include "state.h"
+#include "unwind.h"
 
 #define MIN_START_STAT       3
 
@@ -369,6 +370,8 @@ static void _setup_generic(const newgame_def& ng);
 // Initialise a game based on the choice stored in ng.
 void setup_game(const newgame_def& ng)
 {
+ 
+  
     crawl_state.type = ng.type;
     crawl_state.map  = ng.map;
 
@@ -518,6 +521,9 @@ static void _setup_generic(const newgame_def& ng)
     set_hp(you.hp_max);
     set_mp(you.max_magic_points);
 
+    // Used in case of seeded RNG for the dungeon generation
+    unwind_bool gamesetup(crawl_state.generating_dungeon, true);
+    
     initialise_branch_depths();
     initialise_temples();
     init_level_connectivity();
