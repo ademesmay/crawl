@@ -23,6 +23,7 @@
 #include "command.h"
 #include "decks.h"
 #include "describe.h"
+#include "dgn-overview.h"
 #include "english.h"
 #include "errors.h" // sysfail
 #include "evoke.h"
@@ -2217,8 +2218,8 @@ bool set_ident_type(item_def &item, bool identify)
         && !(item.flags & (ISFLAG_NOTED_ID | ISFLAG_NOTED_GET)))
     {
         // Make a note of it.
-        take_note(Note(NOTE_ID_ITEM, 0, 0, item.name(DESC_A).c_str(),
-                       origin_desc(item).c_str()));
+        take_note(Note(NOTE_ID_ITEM, 0, 0, item.name(DESC_A),
+                       origin_desc(item)));
 
         // Sometimes (e.g. shops) you can ID an item before you get it;
         // don't note twice in those cases.
@@ -2734,14 +2735,7 @@ static MenuEntry* _fixup_runeorb_entry(MenuEntry* me)
         if (!you.runes[rune])
         {
             text += " (";
-            const level_id place = rune_location(rune);
-            if (place.depth == -1)
-            {
-                text += "in ";
-                text += branches[place.branch].longname;
-            }
-            else
-                text += prep_branch_level_name(place);
+            text += branches[rune_location(rune)].longname;
             text += ")";
         }
         text += "</";
@@ -2760,9 +2754,8 @@ static MenuEntry* _fixup_runeorb_entry(MenuEntry* me)
             entry->text = "<magenta>The Orb of Zot</magenta>";
         else
         {
-            entry->text = "<darkgrey>The Orb of Zot ("
-                                     + prep_branch_level_name({BRANCH_ZOT, brdepth[BRANCH_ZOT]})
-                                     + ")</darkgrey>";
+            entry->text = "<darkgrey>The Orb of Zot"
+                          " (the Realm of Zot)</darkgrey>";
         }
     }
 
@@ -2776,39 +2769,46 @@ void display_runes()
                                                    "lightgreen";
 
     auto title = make_stringf("<white>Runes of Zot (</white>"
-                              "<%s>%d</%s><white>/%d) & Orbs of Power</white>",
-                              col, runes_in_pack(), col, you.obtainable_runes);
+                              "<%s>%d</%s><white> collected) & Orbs of Power</white>",
+                              col, runes_in_pack(), col);
     title = string(max(0, 39 - printed_width(title) / 2), ' ') + title;
 
     InvMenu menu(MF_NOSELECT | MF_ALLOW_FORMATTING);
 
     menu.set_title(title);
 
-    vector<const item_def*> items;
+    vector<item_def> items;
 
-    for (int i = 0; i < NUM_RUNE_TYPES; ++i)
+    // Add the runes in branch order.
+    for (branch_iterator it; it; ++it)
     {
-        if (item_type_removed(OBJ_RUNES, i))
+        const branch_type br = it->id;
+        if (!connected_branch_can_exist(br))
             continue;
 
-        auto item = new item_def();
-        item->base_type = OBJ_RUNES;
-        item->sub_type = i;
-        item->quantity = 1;
-        item_colour(*item);
-        items.push_back(item);
+        for (auto rune : branches[br].runes)
+        {
+            item_def item;
+            item.base_type = OBJ_RUNES;
+            item.sub_type = rune;
+            item.quantity = 1;
+            item_colour(item);
+            items.push_back(item);
+        }
     }
-    auto item = new item_def();
-    item->base_type = OBJ_ORBS;
-    item->sub_type = ORB_ZOT;
-    item->quantity = 1;
+
+    item_def item;
+    item.base_type = OBJ_ORBS;
+    item.sub_type = ORB_ZOT;
+    item.quantity = 1;
     items.push_back(item);
 
-    menu.load_items(items, _fixup_runeorb_entry);
+    // We've sorted this vector already, so disable menu sorting. Maybe we
+    // could a menu entry comparator and modify InvMenu::load_items() to allow
+    // passing this in instead of doing a sort ahead of time.
+    menu.load_items(items, _fixup_runeorb_entry, 0, false);
 
     menu.show();
-
-    deleteAll(items);
 }
 
 // Seed ranges for _random_consonant_set: (B)eginning and one-past-the-(E)nd
