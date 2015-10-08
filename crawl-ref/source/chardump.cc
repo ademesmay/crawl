@@ -198,6 +198,16 @@ static void _sdump_header(dump_params &par)
     par.text += " (console)";
 #endif
     par.text += " character file.\n\n";
+
+    if(Options.seed)
+      {
+      par.text += "Seeded game using seed number ";
+      stringstream seed_number;
+      seed_number << std::hex << Options.seed;
+      string seed_string = seed_number.str();
+      par.text += seed_string;
+      par.text += ".\n\n";
+      }
 }
 
 static void _sdump_stats(dump_params &par)
