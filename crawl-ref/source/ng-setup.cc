@@ -432,6 +432,8 @@ static void _setup_hints()
 
 static void _setup_generic(const newgame_def& ng)
 {
+
+  crawl_state.player_generation=true;
     _init_player();
 
 #if TAG_MAJOR_VERSION == 34
@@ -521,6 +523,8 @@ static void _setup_generic(const newgame_def& ng)
     set_hp(you.hp_max);
     set_mp(you.max_magic_points);
 
+
+    crawl_state.player_generation=false;
     // Used in case of seeded RNG for the dungeon generation
     unwind_bool gamesetup(crawl_state.generating_dungeon, true);
     

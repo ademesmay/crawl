@@ -43,10 +43,12 @@ void seed_rng()
 
 uint32_t random_int()
 {
-  if(crawl_state.generating_dungeon)
+  if(crawl_state.player_generation)
     return (get_uint32(2));
+  if(crawl_state.generating_dungeon)
+    return (get_uint32(3));
   else
-    return (crawl_state.generating_level ? get_uint32(you.where_are_you+3) : get_uint32(0));
+    return (crawl_state.generating_level ? get_uint32(you.where_are_you+4) : get_uint32(0));
   
 }
 
@@ -112,11 +114,12 @@ static int _random2(int max, int rng)
 
 // [0, max)
 int random2(int max)
-{
-   if(crawl_state.generating_dungeon)
+{  if(crawl_state.player_generation)
      return (_random2(max,2));
+   if(crawl_state.generating_dungeon)
+     return (_random2(max,3));
    else
-    return (crawl_state.generating_level ? _random2(max,you.where_are_you+3) : _random2(max,0));
+    return (crawl_state.generating_level ? _random2(max,you.where_are_you+4) : _random2(max,0));
 }
 
 // [0, max), separate RNG state
@@ -366,7 +369,7 @@ bool defer_rand::x_chance_in_y_contd(int x, int y, int index)
     do
     {
         if (index == int(bits.size()))
-	  bits.push_back(crawl_state.generating_level ? get_uint32(you.where_are_you+2) : get_uint32(0));
+	  bits.push_back(crawl_state.generating_level ? get_uint32(you.where_are_you+4) : get_uint32(0));
 
         uint64_t expn_rand_1 = uint64_t(bits[index++]) * y;
         uint64_t expn_rand_2 = expn_rand_1 + y;
@@ -389,7 +392,7 @@ int defer_rand::random2(int maxp1)
         return 0;
 
     if (bits.empty())
-      bits.push_back((crawl_state.generating_level ? get_uint32(you.where_are_you+2) : get_uint32(0)));
+      bits.push_back((crawl_state.generating_level ? get_uint32(you.where_are_you+3) : get_uint32(0)));
 
     uint64_t expn_rand_1 = uint64_t(bits[0]) * maxp1;
     uint64_t expn_rand_2 = expn_rand_1 + maxp1;

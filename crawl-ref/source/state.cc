@@ -33,7 +33,7 @@ game_state::game_state()
       seen_hups(0), map_stat_gen(false), obj_stat_gen(false),
       type(GAME_TYPE_NORMAL), last_type(GAME_TYPE_UNSPECIFIED),
       arena_suspended(false), generating_level(false), generating_dungeon(false),
-      dump_maps(false),
+      player_generation(false), dump_maps(false),
       test(false), script(false), build_db(false), tests_selected(),
 #ifdef DGAMELAUNCH
       throttle(true),

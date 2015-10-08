@@ -60,6 +60,7 @@ struct game_state
                             // suspended.
     bool generating_level;
     bool generating_dungeon;
+    bool player_generation;
 
 
     bool dump_maps;         // Dump map Lua to stderr on fresh parse.
