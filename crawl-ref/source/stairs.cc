@@ -490,7 +490,7 @@ void take_stairs(dungeon_feature_type force_stair, bool going_up,
     if (shaft)
     {
         if (shaft_dest == level_id::current())
-        {
+	{
             if (known_shaft)
             {
                 mpr("Strange, the shaft seems to lead back to this level.");
@@ -511,8 +511,18 @@ void take_stairs(dungeon_feature_type force_stair, bool going_up,
 
         string howfar;
         if (shaft_depth > 1)
-            howfar = make_stringf(" for %d floors", shaft_depth);
-
+	  {
+	    // In seeded games, intermediate levels are generated so as not to bamboozle the rng
+	    if(Options.seed)
+	      {
+		for(int i=1;i<shaft_depth;i++)
+		  {
+		    you.depth +=1;
+		    load_level(stair_find, LOAD_ENTER_LEVEL, old_level);
+		  }
+	      }
+	    howfar = make_stringf(" for %d floors", shaft_depth);
+	  }
         mprf("You %s a shaft%s!", you.airborne() ? "are sucked into"
                                                  : "fall through",
                                   howfar.c_str());
